@@ -1,0 +1,128 @@
+{
+  "nav": {
+    "home": "ਹੋਮ",
+    "sos": "ਐਸਓਐਸ",
+    "products": "ਉਤਪਾਦ",
+    "aboutUs": "ਸਾਡੇ ਬਾਰੇ",
+    "forDoctors": "ਡਾਕਟਰਾਂ ਲਈ",
+    "ourClients": "ਸਾਡੇ ਗਾਹਕ",
+    "abha": "ਆਭਾ",
+    "careers": "ਕਰੀਅਰ",
+    "news": "ਖਬਰਾਂ ਅਤੇ ਸਮਾਗਮ",
+    "myBookings": "ਮੇਰੀਆਂ ਬੁਕਿੰਗਾਂ",
+    "profile": "ਪ੍ਰੋਫਾਈਲ",
+    "signIn": "ਸਾਈਨ ਇਨ"
+  },
+  "hero": {
+    "title": "ਡਾਕਟਰ ਸਲਾਹ-ਮਸ਼ਵਰੇ ਬੁੱਕ ਕਰੋ",
+    "titleHighlight": "ਤੁਰੰਤ",
+    "subtitle": "ਕਿਸੇ ਵੀ ਸਿਹਤ ਸਮੱਸਿਆ ਲਈ ਮਾਹਰ ਸਲਾਹ ਪ੍ਰਾਪਤ ਕਰੋ — ਕਦੇ ਵੀ, ਕਿਤੇ ਵੀ।",
+    "sosButton": "🚨 ਐਸਓਐਸ - ਐਂਬੂਲੈਂਸ ਲਾਈਵ ਟਰੈਕ ਕਰੋ",
+    "abdmCompliant": "ABDM ਅਨੁਕੂਲ",
+    "isoCertified": "ISO ਪ੍ਰਮਾਣਿਤ",
+    "dataSecure": "ਡੇਟਾ ਸੁਰੱਖਿਅਤ"
+  },
+  "stats": {
+    "ambulances": "ਐਂਬੂਲੈਂਸਾਂ",
+    "hospitals": "ਸਾਂਝੇਦਾਰ ਹਸਪਤਾਲ",
+    "responseTime": "ਔਸਤ ਜਵਾਬ ਸਮਾਂ",
+    "coverage": "ਸ਼ਹਿਰ ਕਵਰ"
+  },
+  "emergency": {
+    "title": "ਐਮਰਜੈਂਸੀ ਸੇਵਾਵਾਂ",
+    "subtitle": "24/7 ਤੇਜ਼ ਜਵਾਬ ਮੈਡੀਕਲ ਸਹਾਇਤਾ",
+    "ambulance": "ਐਂਬੂਲੈਂਸ ਸੇਵਾ",
+    "ambulanceDesc": "ਲਾਈਵ GPS ਟਰੈਕਿੰਗ ਨਾਲ ਤੇਜ਼ ਐਂਬੂਲੈਂਸ ਡਿਸਪੈਚ",
+    "firstAid": "ਫਸਟ ਏਡ ਸਹਾਇਤਾ",
+    "firstAidDesc": "ਮਦਦ ਆਉਣ ਤੱਕ ਤੁਰੰਤ ਮੈਡੀਕਲ ਮਾਰਗਦਰਸ਼ਨ",
+    "hospital": "ਹਸਪਤਾਲ ਕਨੈਕਟ",
+    "hospitalDesc": "ਨੇੜੇ ਦੇ ਐਮਰਜੈਂਸੀ ਕਮਰਿਆਂ ਨਾਲ ਸਿੱਧਾ ਕੁਨੈਕਸ਼ਨ"
+  },
+  "abha": {
+    "title": "ਆਭਾ ਹੈਲਥ ਕਾਰਡ",
+    "subtitle": "ਤੁਹਾਡੀ ਡਿਜੀਟਲ ਸਿਹਤ ਪਛਾਣ",
+    "description": "ਪੂਰੇ ਭਾਰਤ ਵਿੱਚ ਡਿਜੀਟਲ ਸਿਹਤ ਰਿਕਾਰਡਾਂ ਤੱਕ ਸਹਿਜ ਪਹੁੰਚ ਲਈ ਆਪਣਾ ਆਯੁਸ਼ਮਾਨ ਭਾਰਤ ਸਿਹਤ ਖਾਤਾ ਬਣਾਓ।",
+    "createCard": "ਆਭਾ ਕਾਰਡ ਬਣਾਓ",
+    "learnMore": "ਹੋਰ ਜਾਣੋ"
+  },
+  "aiAssistant": {
+    "title": "AI ਸਿਹਤ ਸਹਾਇਕ",
+    "subtitle": "AI ਦੁਆਰਾ ਸੰਚਾਲਿਤ ਤੁਰੰਤ ਸਿਹਤ ਮਾਰਗਦਰਸ਼ਨ ਪ੍ਰਾਪਤ ਕਰੋ",
+    "placeholder": "ਆਪਣੇ ਲੱਛਣ ਦੱਸੋ...",
+    "askButton": "AI ਨੂੰ ਪੁੱਛੋ"
+  },
+  "chatbot": {
+    "title": "ਸਿਹਤ ਸਹਾਇਕ",
+    "placeholder": "ਸਿਹਤ ਬਾਰੇ ਕੁਝ ਵੀ ਪੁੱਛੋ...",
+    "send": "ਭੇਜੋ",
+    "thinking": "ਸੋਚ ਰਿਹਾ ਹੈ..."
+  },
+  "auth": {
+    "signIn": "ਸਾਈਨ ਇਨ",
+    "signUp": "ਸਾਈਨ ਅੱਪ",
+    "email": "ਈਮੇਲ",
+    "password": "ਪਾਸਵਰਡ",
+    "fullName": "ਪੂਰਾ ਨਾਮ",
+    "phone": "ਫੋਨ ਨੰਬਰ",
+    "forgotPassword": "ਪਾਸਵਰਡ ਭੁੱਲ ਗਏ?",
+    "noAccount": "ਖਾਤਾ ਨਹੀਂ ਹੈ?",
+    "hasAccount": "ਪਹਿਲਾਂ ਤੋਂ ਖਾਤਾ ਹੈ?",
+    "signInButton": "ਸਾਈਨ ਇਨ ਕਰੋ",
+    "signUpButton": "ਖਾਤਾ ਬਣਾਓ"
+  },
+  "profile": {
+    "title": "ਮੇਰੀ ਪ੍ਰੋਫਾਈਲ",
+    "fullName": "ਪੂਰਾ ਨਾਮ",
+    "phone": "ਫੋਨ ਨੰਬਰ",
+    "address": "ਪਤਾ",
+    "bloodGroup": "ਖੂਨ ਦਾ ਗਰੁੱਪ",
+    "emergencyContact": "ਐਮਰਜੈਂਸੀ ਸੰਪਰਕ",
+    "save": "ਪ੍ਰੋਫਾਈਲ ਸੇਵ ਕਰੋ",
+    "signOut": "ਸਾਈਨ ਆਊਟ"
+  },
+  "bookings": {
+    "title": "ਬੁਕਿੰਗ ਇਤਿਹਾਸ",
+    "noBookings": "ਕੋਈ ਬੁਕਿੰਗ ਨਹੀਂ ਮਿਲੀ",
+    "status": "ਸਥਿਤੀ",
+    "pickup": "ਪਿਕਅੱਪ",
+    "destination": "ਮੰਜ਼ਿਲ",
+    "driver": "ਡਰਾਈਵਰ",
+    "ambulance": "ਐਂਬੂਲੈਂਸ",
+    "pending": "ਬਕਾਇਆ",
+    "active": "ਸਰਗਰਮ",
+    "completed": "ਪੂਰਾ",
+    "cancelled": "ਰੱਦ"
+  },
+  "sos": {
+    "title": "ਐਮਰਜੈਂਸੀ ਐਸਓਐਸ",
+    "subtitle": "ਤੁਰੰਤ ਐਂਬੂਲੈਂਸ ਸਹਾਇਤਾ ਦੀ ਬੇਨਤੀ ਕਰੋ",
+    "requestAmbulance": "ਐਂਬੂਲੈਂਸ ਦੀ ਬੇਨਤੀ ਕਰੋ",
+    "tracking": "ਤੁਹਾਡੀ ਐਂਬੂਲੈਂਸ ਨੂੰ ਟਰੈਕ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ",
+    "cancelRequest": "ਬੇਨਤੀ ਰੱਦ ਕਰੋ",
+    "confirmCancel": "ਕੀ ਤੁਸੀਂ ਯਕੀਨਨ ਰੱਦ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ?",
+    "driverInfo": "ਡਰਾਈਵਰ ਜਾਣਕਾਰੀ",
+    "eta": "ਅੰਦਾਜ਼ਨ ਆਗਮਨ"
+  },
+  "common": {
+    "loading": "ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ...",
+    "error": "ਇੱਕ ਗਲਤੀ ਹੋਈ",
+    "success": "ਸਫਲ",
+    "cancel": "ਰੱਦ ਕਰੋ",
+    "confirm": "ਪੁਸ਼ਟੀ ਕਰੋ",
+    "save": "ਸੇਵ ਕਰੋ",
+    "edit": "ਸੰਪਾਦਿਤ ਕਰੋ",
+    "delete": "ਮਿਟਾਓ",
+    "back": "ਵਾਪਸ",
+    "next": "ਅੱਗੇ",
+    "submit": "ਜਮ੍ਹਾਂ ਕਰੋ"
+  },
+  "language": {
+    "select": "ਭਾਸ਼ਾ ਚੁਣੋ",
+    "en": "English",
+    "hi": "हिन्दी",
+    "pa": "ਪੰਜਾਬੀ",
+    "mr": "मराठी",
+    "bn": "বাংলা",
+    "ta": "தமிழ்"
+  }
+}

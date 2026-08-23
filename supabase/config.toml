@@ -1,0 +1,7 @@
+project_id = "ewfqmqlofntoixsdeqcm"
+
+[functions.chat]
+verify_jwt = true
+
+[functions.send-whatsapp-notification]
+verify_jwt = true

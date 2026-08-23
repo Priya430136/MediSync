@@ -1,0 +1,12 @@
+{
+  "name": "MediSync",
+  "description": "Multi-portal clinic appointment manager with separate patient, doctor, and admin portals, AI pre-visit symptom triage, AI post-visit summaries, double-booking prevention, doctor leave conflict handling, and Google Calendar & email integrations.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

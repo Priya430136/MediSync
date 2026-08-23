@@ -1,0 +1,132 @@
+{
+  "nav": {
+    "home": "Home",
+    "sos": "SOS",
+    "products": "Products",
+    "aboutUs": "About Us",
+    "forDoctors": "For Doctors",
+    "ourClients": "Our Clients",
+    "abha": "ABHA",
+    "careers": "Careers",
+    "news": "News & Events",
+    "myBookings": "My Bookings",
+    "profile": "Profile",
+    "signIn": "Sign In"
+  },
+  "hero": {
+    "title": "Book Doctor Consultations",
+    "titleHighlight": "Instantly",
+    "subtitle": "Get expert consultations for any health issue — anytime, anywhere.",
+    "sosButton": "🚨 SOS - Track Ambulance Live",
+    "abdmCompliant": "ABDM Compliant",
+    "isoCertified": "ISO Certified",
+    "dataSecure": "Data Secure"
+  },
+  "stats": {
+    "patientsServed": "Patients Served",
+    "healthcareProviders": "Healthcare Providers",
+    "clinicsDigitized": "Clinics Digitized",
+    "supportAvailable": "Support Available",
+    "ambulances": "Ambulances",
+    "hospitals": "Partner Hospitals",
+    "responseTime": "Avg Response Time",
+    "coverage": "Cities Covered"
+  },
+  "emergency": {
+    "title": "Emergency Services",
+    "subtitle": "24/7 rapid response medical assistance",
+    "ambulance": "Ambulance Service",
+    "ambulanceDesc": "Quick ambulance dispatch with live GPS tracking",
+    "firstAid": "First Aid Support",
+    "firstAidDesc": "Immediate medical guidance while help arrives",
+    "hospital": "Hospital Connect",
+    "hospitalDesc": "Direct connection to nearest emergency rooms"
+  },
+  "abha": {
+    "title": "ABHA Health Card",
+    "subtitle": "Your Digital Health Identity",
+    "description": "Create your Ayushman Bharat Health Account for seamless access to digital health records across India.",
+    "createCard": "Create ABHA Card",
+    "learnMore": "Learn More"
+  },
+  "aiAssistant": {
+    "title": "AI Health Assistant",
+    "subtitle": "Get instant health guidance powered by AI",
+    "placeholder": "Describe your symptoms...",
+    "askButton": "Ask AI"
+  },
+  "chatbot": {
+    "title": "Health Assistant",
+    "placeholder": "Ask me anything about health...",
+    "send": "Send",
+    "thinking": "Thinking..."
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full Name",
+    "phone": "Phone Number",
+    "forgotPassword": "Forgot Password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signInButton": "Sign In",
+    "signUpButton": "Create Account"
+  },
+  "profile": {
+    "title": "My Profile",
+    "fullName": "Full Name",
+    "phone": "Phone Number",
+    "address": "Address",
+    "bloodGroup": "Blood Group",
+    "emergencyContact": "Emergency Contact",
+    "save": "Save Profile",
+    "signOut": "Sign Out"
+  },
+  "bookings": {
+    "title": "Booking History",
+    "noBookings": "No bookings found",
+    "status": "Status",
+    "pickup": "Pickup",
+    "destination": "Destination",
+    "driver": "Driver",
+    "ambulance": "Ambulance",
+    "pending": "Pending",
+    "active": "Active",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "sos": {
+    "title": "Emergency SOS",
+    "subtitle": "Request immediate ambulance assistance",
+    "requestAmbulance": "Request Ambulance",
+    "tracking": "Tracking Your Ambulance",
+    "cancelRequest": "Cancel Request",
+    "confirmCancel": "Are you sure you want to cancel?",
+    "driverInfo": "Driver Information",
+    "eta": "Estimated Arrival"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit"
+  },
+  "language": {
+    "select": "Select Language",
+    "en": "English",
+    "hi": "हिन्दी",
+    "pa": "ਪੰਜਾਬੀ",
+    "mr": "मराठी",
+    "bn": "বাংলা",
+    "ta": "தமிழ்"
+  }
+}
