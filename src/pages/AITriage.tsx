@@ -72,230 +72,242 @@ const AITriage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background">
       <Navbar />
       
-      {/* High-Tech Hero Section */}
-      <div className="pt-24 pb-12 relative overflow-hidden bg-gradient-to-b from-primary/10 via-background to-background">
-        <div className="absolute top-0 right-[-10%] w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute top-[20%] left-[-10%] w-[300px] h-[300px] bg-blue-500/10 rounded-full blur-[80px] pointer-events-none" />
-        
-        <div className="container mx-auto px-4 relative z-10 text-center space-y-4">
-          <div className="text-left mb-2">
+      <main className="portal-content pt-6 lg:pt-8 pb-20 px-4">
+        <div className="max-w-5xl mx-auto space-y-6">
+          {/* Breadcrumbs */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Link 
+                to="/patient-portal" 
+                className="inline-flex items-center gap-1.5 font-medium hover:text-primary transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Patient Portal</span>
+              </Link>
+              <span>/</span>
+              <span className="font-semibold text-foreground">AI Symptom Triage</span>
+            </div>
+
             <Link 
               to="/" 
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+              className="text-xs font-semibold text-muted-foreground hover:text-primary transition-colors"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Home (Landing Page)</span>
+              Back to Home
             </Link>
           </div>
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary font-bold border border-primary/20 mb-2 shadow-inner"
-          >
-            <Sparkles className="w-4 h-4 fill-primary" /> AMBULA AI COMPUTE CORE
-          </motion.div>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-4xl md:text-6xl font-black tracking-tight flex items-center justify-center gap-3"
-          >
-            Smart <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400">Triage</span> System
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-lg text-muted-foreground font-medium max-w-2xl mx-auto"
-          >
-            Describe what you're feeling. Our cutting-edge machine learning engine will instantly analyze your symptoms and recommend the safest clinical pathway.
-          </motion.p>
-        </div>
-      </div>
 
-      <div className="container mx-auto px-4 max-w-4xl relative z-20">
-        <div className="grid md:grid-cols-2 gap-8">
-          
-          {/* Left: Input Form */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card className="border-border/50 shadow-2xl bg-card/60 backdrop-blur-xl h-full flex flex-col">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-2xl">
-                  <Activity className="w-6 h-6 text-primary" /> Primary Symptoms
-                </CardTitle>
-                <CardDescription>Be as detailed as possible for the best clinical mapping.</CardDescription>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col space-y-4">
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {COMMON_SYMPTOMS.map(sym => (
-                    <Badge 
-                      key={sym} 
-                      variant="secondary" 
-                      className="cursor-pointer hover:bg-primary hover:text-white transition-colors py-1 px-3"
-                      onClick={() => addSymptom(sym)}
-                    >
-                      + {sym}
-                    </Badge>
-                  ))}
-                </div>
-                
-                <Textarea 
-                  placeholder="E.g., I've been having severe chest pains for the last 30 minutes and I feel dizzy..."
-                  className="flex-1 min-h-[150px] resize-none rounded-xl text-base p-4 border-2 focus-visible:ring-primary/50"
-                  value={symptoms}
-                  onChange={(e) => setSymptoms(e.target.value)}
-                />
-                
-                <Button 
-                  size="lg" 
-                  className="w-full h-14 rounded-xl font-bold text-lg gap-2 shadow-lg hover:shadow-primary/25 transition-all"
-                  onClick={handleAnalyze}
-                  disabled={isAnalyzing || !symptoms.trim()}
-                >
-                  {isAnalyzing ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" /> Processing Neural Matrix...
-                    </>
-                  ) : (
-                    <>
-                      <Brain className="w-5 h-5" /> Analyze Severity
-                    </>
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
+          {/* High-Tech Hero Header Banner */}
+          <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-blue-500/5 p-6 md:p-8 text-center space-y-3 shadow-xs">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-primary/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-60 h-60 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
+            
+            <div className="relative z-10 space-y-2">
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 text-primary font-bold text-xs border border-primary/25 shadow-2xs"
+              >
+                <Sparkles className="w-3.5 h-3.5 fill-primary" /> MEDISYNC AI CLINICAL TRIAGE ENGINE
+              </motion.div>
+              <motion.h1 
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-3xl md:text-5xl font-black tracking-tight flex items-center justify-center gap-2"
+              >
+                Smart <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">Triage</span> Assessment
+              </motion.h1>
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="text-sm md:text-base text-muted-foreground font-medium max-w-2xl mx-auto"
+              >
+                Enter what you are experiencing. The neural analysis matrix assesses clinical indicators in seconds and guides you to the fastest care route.
+              </motion.p>
+            </div>
+          </div>
 
-          {/* Right: Results / Scanner state */}
-          <div className="relative h-[400px] md:h-auto">
-            {/* Empty State */}
-            <AnimatePresence>
-              {!isAnalyzing && !result && (
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="absolute inset-0 border-2 border-dashed border-border/50 rounded-2xl flex flex-col items-center justify-center p-8 text-center bg-muted/20"
-                >
-                  <div className="w-24 h-24 mb-6 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 animate-[pulse_3s_ease-in-out_infinite]">
-                    <ShieldCheck className="w-10 h-10 text-primary/40" />
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground/50">Awaiting Input Data</h3>
-                  <p className="text-muted-foreground mt-2 text-sm">Please enter your symptoms to initialize the diagnostic sequence.</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Loading Scanner State */}
-            <AnimatePresence>
-              {isAnalyzing && (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="absolute inset-0 bg-background/50 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center border border-primary/20 shadow-[0_0_50px_rgba(37,99,235,0.15)] overflow-hidden"
-                >
-                  {/* Scanner line */}
-                  <div className="absolute top-0 left-0 w-full h-1 bg-primary/50 shadow-[0_0_20px_rgba(37,99,235,1)] animate-[scan_2s_ease-in-out_infinite]" />
-                  
-                  <div className="relative w-32 h-32 mb-8 flex items-center justify-center">
-                    <div className="absolute inset-0 border-[3px] border-t-primary border-r-primary/30 border-b-primary/10 border-l-primary/60 rounded-full animate-spin" style={{ animationDuration: '3s' }} />
-                    <div className="absolute inset-2 border-[3px] border-t-blue-400 border-b-blue-400/20 border-l-transparent border-r-transparent rounded-full animate-spin ring-reverse" style={{ animationDuration: '2s', animationDirection: 'reverse' }} />
-                    <Brain className="w-10 h-10 text-primary animate-pulse" />
+          {/* Interactive Form & Analysis Grid */}
+          <div className="grid md:grid-cols-2 gap-6 relative z-10">
+            {/* Left: Input Form */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.25 }}
+            >
+              <Card className="border-border shadow-md bg-card/80 backdrop-blur-xl h-full flex flex-col">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center gap-2 text-xl font-bold">
+                    <Activity className="w-5 h-5 text-primary" /> Describe Symptoms
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Select quick common indicators below or describe in your own words.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1 flex flex-col space-y-4">
+                  <div className="flex flex-wrap gap-1.5 mb-1">
+                    {COMMON_SYMPTOMS.map(sym => (
+                      <Badge 
+                        key={sym} 
+                        variant="secondary" 
+                        className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors py-1 px-2.5 text-xs font-semibold"
+                        onClick={() => addSymptom(sym)}
+                      >
+                        + {sym}
+                      </Badge>
+                    ))}
                   </div>
                   
-                  <div className="flex items-center gap-2 font-mono text-primary font-bold">
-                    <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
-                    ANALYZING BIOMETRIC MARKERS...
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  <Textarea 
+                    placeholder="E.g., I've been having sudden chest tightness for the last 20 minutes, nausea and mild shortness of breath..."
+                    className="flex-1 min-h-[140px] resize-none rounded-xl text-sm p-3.5 border focus-visible:ring-primary"
+                    value={symptoms}
+                    onChange={(e) => setSymptoms(e.target.value)}
+                  />
+                  
+                  <Button 
+                    size="lg" 
+                    className="w-full h-12 rounded-xl font-bold text-base gap-2 shadow-md hover:shadow-primary/20 transition-all"
+                    onClick={handleAnalyze}
+                    disabled={isAnalyzing || !symptoms.trim()}
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" /> Analyzing Neural Matrix...
+                      </>
+                    ) : (
+                      <>
+                        <Brain className="w-4 h-4" /> Run Severity Analysis
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
 
-            {/* Result State */}
-            <AnimatePresence>
-              {result && !isAnalyzing && (
-                <motion.div 
-                  initial={{ opacity: 0, x: 30, scale: 0.95 }}
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                  className="absolute inset-0"
-                >
-                  <Card className={`h-full border-2 overflow-hidden flex flex-col relative ${
-                    result.severity === 'critical' ? 'border-red-500/50 shadow-[0_0_40px_rgba(239,68,68,0.2)] bg-gradient-to-b from-red-500/5 to-background' :
-                    result.severity === 'warning' ? 'border-yellow-500/50 shadow-[0_0_40px_rgba(234,179,8,0.15)] bg-gradient-to-b from-yellow-500/5 to-background' :
-                    'border-green-500/50 shadow-[0_0_40px_rgba(34,197,94,0.15)] bg-gradient-to-b from-green-500/5 to-background'
-                  }`}>
-                    {/* Animated background glow */}
-                    <div className={`absolute top-0 right-0 p-32 blur-[80px] rounded-full pointer-events-none ${
-                       result.severity === 'critical' ? 'bg-red-500/10' :
-                       result.severity === 'warning' ? 'bg-yellow-500/10' :
-                       'bg-green-500/10'
-                    }`} />
+            {/* Right: Results / Scanner state */}
+            <div className="relative min-h-[380px] md:min-h-[auto] flex">
+              {/* Empty State */}
+              <AnimatePresence>
+                {!isAnalyzing && !result && (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="w-full h-full border-2 border-dashed border-border/80 rounded-2xl flex flex-col items-center justify-center p-8 text-center bg-muted/20"
+                  >
+                    <div className="w-16 h-16 mb-4 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 animate-pulse">
+                      <ShieldCheck className="w-8 h-8 text-primary" />
+                    </div>
+                    <h3 className="text-lg font-bold text-foreground">Awaiting Symptom Input</h3>
+                    <p className="text-muted-foreground mt-1.5 text-xs max-w-xs">
+                      Type your current health symptoms on the left to activate the AI clinical severity engine.
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-                    <CardHeader className="relative z-10 pb-2">
-                      <div className="flex justify-between items-start mb-4">
-                        <Badge className={`px-3 py-1 text-sm font-bold uppercase tracking-widest ${
-                          result.severity === 'critical' ? 'bg-red-500 text-white' :
-                          result.severity === 'warning' ? 'bg-yellow-500 text-black' :
-                          'bg-green-500 text-white'
-                        }`}>
-                          SEVERITY: {result.severity}
-                        </Badge>
-                        <div className={`font-black text-4xl ${
-                          result.severity === 'critical' ? 'text-red-500' :
-                          result.severity === 'warning' ? 'text-yellow-500' :
-                          'text-green-500'
-                        }`}>
-                          {result.score}%
-                        </div>
-                      </div>
-                      <CardTitle className="text-2xl font-bold flex items-center gap-2">
-                        {result.severity === 'critical' && <AlertTriangle className="w-6 h-6 text-red-500 animate-pulse" />}
-                        {result.severity === 'warning' && <Thermometer className="w-6 h-6 text-yellow-500" />}
-                        {result.severity === 'low' && <HeartPulse className="w-6 h-6 text-green-500" />}
-                        {result.title}
-                      </CardTitle>
-                    </CardHeader>
+              {/* Loading Scanner State */}
+              <AnimatePresence>
+                {isAnalyzing && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-background/90 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center border border-primary/30 shadow-lg overflow-hidden"
+                  >
+                    <div className="absolute top-0 left-0 w-full h-1 bg-primary shadow-[0_0_15px_rgba(239,68,68,0.8)] animate-[scan_2s_ease-in-out_infinite]" />
                     
-                    <CardContent className="relative z-10 flex-1 flex flex-col justify-between pt-4">
-                      <p className="text-lg text-foreground/80 leading-relaxed font-medium">
-                        {result.description}
-                      </p>
+                    <div className="relative w-24 h-24 mb-6 flex items-center justify-center">
+                      <div className="absolute inset-0 border-[3px] border-t-primary border-r-primary/30 border-b-transparent border-l-primary/60 rounded-full animate-spin" style={{ animationDuration: '2s' }} />
+                      <div className="absolute inset-2 border-[2px] border-t-blue-400 border-b-transparent rounded-full animate-spin" style={{ animationDuration: '1.5s', animationDirection: 'reverse' }} />
+                      <Brain className="w-8 h-8 text-primary animate-pulse" />
+                    </div>
+                    
+                    <div className="flex items-center gap-2 font-mono text-primary font-bold text-xs">
+                      <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                      ANALYZING BIOMETRIC MARKERS...
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-                      <div className="mt-8 space-y-4 bg-background/50 backdrop-blur-sm p-5 rounded-2xl border border-border/50">
-                        <h4 className="font-bold text-sm tracking-widest text-muted-foreground uppercase">Recommended Next Step</h4>
-                        <Button 
-                          size="lg" 
-                          className={`w-full h-14 text-lg font-bold shadow-lg gap-2 ${
-                            result.severity === 'critical' ? 'bg-red-500 hover:bg-red-600 text-white' :
-                            result.severity === 'warning' ? 'bg-yellow-500 hover:bg-yellow-600 text-black' :
-                            'bg-green-600 hover:bg-green-700 text-white'
-                          }`}
-                          onClick={() => navigate(result.route)}
-                        >
-                          {result.severity === 'critical' && <Ambulance className="w-5 h-5" />}
-                          {result.severity === 'warning' && <Video className="w-5 h-5" />}
-                          {result.severity === 'low' && <Hospital className="w-5 h-5" />}
-                          {result.action}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )}
-            </AnimatePresence>
+              {/* Result State */}
+              <AnimatePresence>
+                {result && !isAnalyzing && (
+                  <motion.div 
+                    initial={{ opacity: 0, x: 20, scale: 0.98 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    className="w-full h-full"
+                  >
+                    <Card className={`h-full border-2 overflow-hidden flex flex-col relative ${
+                      result.severity === 'critical' ? 'border-destructive/60 bg-gradient-to-b from-destructive/10 to-background shadow-lg' :
+                      result.severity === 'warning' ? 'border-amber-500/60 bg-gradient-to-b from-amber-500/10 to-background shadow-lg' :
+                      'border-emerald-500/60 bg-gradient-to-b from-emerald-500/10 to-background shadow-lg'
+                    }`}>
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start mb-3">
+                          <Badge className={`px-2.5 py-0.5 text-xs font-black uppercase tracking-wider ${
+                            result.severity === 'critical' ? 'bg-destructive text-destructive-foreground' :
+                            result.severity === 'warning' ? 'bg-amber-500 text-black' :
+                            'bg-emerald-600 text-white'
+                          }`}>
+                            SEVERITY: {result.severity}
+                          </Badge>
+                          <div className={`font-black text-3xl ${
+                            result.severity === 'critical' ? 'text-destructive' :
+                            result.severity === 'warning' ? 'text-amber-600 dark:text-amber-400' :
+                            'text-emerald-600 dark:text-emerald-400'
+                          }`}>
+                            {result.score}%
+                          </div>
+                        </div>
+                        <CardTitle className="text-xl font-bold flex items-center gap-2">
+                          {result.severity === 'critical' && <AlertTriangle className="w-5 h-5 text-destructive animate-pulse" />}
+                          {result.severity === 'warning' && <Thermometer className="w-5 h-5 text-amber-500" />}
+                          {result.severity === 'low' && <HeartPulse className="w-5 h-5 text-emerald-500" />}
+                          {result.title}
+                        </CardTitle>
+                      </CardHeader>
+                      
+                      <CardContent className="flex-1 flex flex-col justify-between pt-2 space-y-4">
+                        <p className="text-sm text-muted-foreground font-medium leading-relaxed">
+                          {result.description}
+                        </p>
 
+                        <div className="space-y-3 bg-background/70 backdrop-blur-sm p-4 rounded-xl border border-border">
+                          <h4 className="font-extrabold text-[11px] tracking-wider text-muted-foreground uppercase">
+                            Recommended Action
+                          </h4>
+                          <Button 
+                            size="lg" 
+                            className={`w-full h-12 text-sm font-bold shadow-md gap-2 ${
+                              result.severity === 'critical' ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground' :
+                              result.severity === 'warning' ? 'bg-amber-500 hover:bg-amber-600 text-black' :
+                              'bg-emerald-600 hover:bg-emerald-700 text-white'
+                            }`}
+                            onClick={() => navigate(result.route)}
+                          >
+                            {result.severity === 'critical' && <Ambulance className="w-4 h-4" />}
+                            {result.severity === 'warning' && <Video className="w-4 h-4" />}
+                            {result.severity === 'low' && <Hospital className="w-4 h-4" />}
+                            <span>{result.action}</span>
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

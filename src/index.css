@@ -117,4 +117,40 @@ All colors MUST be HSL.
     background-size: 32px 32px;
     background-attachment: fixed;
   }
+
+  /* Portal Left Sidebar Layout Offset & Collapsible States */
+  body.in-portal main,
+  body.in-portal .portal-content {
+    transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @media (max-width: 1023px) {
+    body.in-portal main,
+    body.in-portal .portal-content {
+      padding-top: 4.5rem;
+      padding-left: 0;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    body.in-portal:not(.sidebar-collapsed) main,
+    body.in-portal:not(.sidebar-collapsed) .portal-content {
+      padding-left: 16.5rem !important; /* 64 = 16rem + 0.5rem buffer */
+    }
+    body.in-portal.sidebar-collapsed main,
+    body.in-portal.sidebar-collapsed .portal-content {
+      padding-left: 0 !important;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    body.in-portal:not(.sidebar-collapsed) main,
+    body.in-portal:not(.sidebar-collapsed) .portal-content {
+      padding-left: 18.5rem !important; /* 72 = 18rem + 0.5rem buffer */
+    }
+    body.in-portal.sidebar-collapsed main,
+    body.in-portal.sidebar-collapsed .portal-content {
+      padding-left: 0 !important;
+    }
+  }
 }

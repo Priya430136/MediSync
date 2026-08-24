@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -13,8 +14,6 @@ import {
   ShieldCheck, 
   User, 
   Stethoscope, 
-  Car, 
-  Radio, 
   Building2, 
   Eye, 
   EyeOff, 
@@ -44,7 +43,7 @@ const signUpSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string()
     .min(6, "Password must be at least 6 characters"),
-  role: z.enum(["user", "driver", "operator", "hospital", "doctor"], {
+  role: z.enum(["user", "hospital", "doctor"], {
     errorMap: () => ({ message: "Please select a valid role" }),
   }),
 });
@@ -75,28 +74,6 @@ const DEMO_ACCOUNTS = [
     desc: "Patient queue, AI summary & prescriptions"
   },
   {
-    role: "driver",
-    label: "Ambulance Driver",
-    email: "driver@rapidresq.com",
-    password: "Password@123",
-    name: "Rajesh Kumar",
-    icon: Car,
-    color: "text-amber-600 bg-amber-50 border-amber-200 dark:bg-amber-950/40 dark:border-amber-800",
-    destination: "/driver",
-    desc: "Live GPS tracking & emergency dispatch"
-  },
-  {
-    role: "operator",
-    label: "Dispatch Operator",
-    email: "operator@rapidresq.com",
-    password: "Password@123",
-    name: "Amit Verma",
-    icon: Radio,
-    color: "text-purple-600 bg-purple-50 border-purple-200 dark:bg-purple-950/40 dark:border-purple-800",
-    destination: "/operator-dashboard",
-    desc: "Triaging 108 SOS calls & triage queue"
-  },
-  {
     role: "hospital",
     label: "Hospital Admin",
     email: "hospital@rapidresq.com",
@@ -125,6 +102,23 @@ const Auth = () => {
   const [signInPassword, setSignInPassword] = useState("");
 
   const redirectParam = searchParams.get("redirect") || searchParams.get("returnUrl");
+  const portalParam = searchParams.get("portal")?.toLowerCase();
+
+  const getPortalInfo = (p?: string) => {
+    switch (p) {
+      case 'doctor':
+        return { name: 'Doctor Workspace', role: 'doctor', color: 'text-emerald-700 bg-emerald-50 border-emerald-200' };
+      case 'hospital':
+        return { name: 'Hospital ER Dashboard', role: 'hospital', color: 'text-rose-700 bg-rose-50 border-rose-200' };
+      case 'admin':
+        return { name: 'System Admin Portal', role: 'admin', color: 'text-slate-800 bg-slate-100 border-slate-300' };
+      case 'patient':
+      default:
+        return { name: 'Patient Portal', role: 'user', color: 'text-blue-700 bg-blue-50 border-blue-200' };
+    }
+  };
+
+  const portalInfo = portalParam ? getPortalInfo(portalParam) : null;
 
   const getRedirectForRole = (role?: string) => {
     // If a redirect URL parameter was passed (and is a relative path), respect it
@@ -135,12 +129,10 @@ const Auth = () => {
     switch (role) {
       case "doctor":
         return "/doctor-portal";
-      case "driver":
-        return "/driver";
-      case "operator":
-        return "/operator-dashboard";
       case "hospital":
         return "/hospital";
+      case "admin":
+        return "/admin";
       case "user":
       default:
         return "/patient-portal";
@@ -491,6 +483,22 @@ const Auth = () => {
             <p className="text-xs text-muted-foreground">Emergency healthcare & doctor booking portal</p>
           </div>
 
+          {/* Portal Restriction Alert Banner if portalParam is present */}
+          {portalInfo && (
+            <div className={`p-3.5 rounded-2xl border ${portalInfo.color} flex items-center justify-between shadow-sm animate-in fade-in`}>
+              <div className="flex items-center gap-2.5">
+                <Lock className="w-4 h-4 shrink-0" />
+                <div>
+                  <p className="text-xs font-bold leading-tight">Accessing {portalInfo.name}</p>
+                  <p className="text-[11px] opacity-80">Only accounts with {portalInfo.name} authorization can sign into this workspace.</p>
+                </div>
+              </div>
+              <Badge variant="outline" className="text-[10px] font-bold shrink-0 bg-background/80">
+                Single-Portal Policy
+              </Badge>
+            </div>
+          )}
+
           {/* Quick Demo Login Cards */}
           <div className="bg-muted/40 border border-border/70 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
             <div className="flex items-center justify-between">
@@ -685,14 +693,13 @@ const Auth = () => {
                       <select
                         id="role"
                         name="role"
-                        defaultValue="user"
+                        defaultValue={portalInfo?.role || "user"}
+                        key={portalInfo?.role || "default-user"}
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         required
                       >
                         <option value="user">Patient / Citizen</option>
                         <option value="doctor">Consulting Doctor / Specialist</option>
-                        <option value="driver">Ambulance Driver</option>
-                        <option value="operator">Emergency Dispatch Operator</option>
                         <option value="hospital">Hospital Administrator</option>
                       </select>
                       <ErrorMessage message={signUpErrors.role} />

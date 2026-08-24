@@ -40,7 +40,6 @@ interface Doctor {
 const CreatePrescription = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [isOperator, setIsOperator] = useState(false);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -71,29 +70,28 @@ const CreatePrescription = () => {
   const checkAccess = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      navigate('/auth');
+      navigate('/auth?portal=doctor');
       return;
     }
 
-    // Check if user is operator, doctor, or admin
+    // Check if user is doctor or admin
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('user_id', user.id)
       .single();
 
-    const hasAccess = profile?.role === 'doctor' || profile?.role === 'operator' || profile?.role === 'admin';
+    const hasAccess = profile?.role === 'doctor' || profile?.role === 'admin';
     if (!hasAccess) {
       toast({
         title: "Access Denied",
-        description: "Only doctors/operators can create prescriptions",
+        description: "Only doctors and clinical staff can create prescriptions",
         variant: "destructive"
       });
-      navigate('/');
+      navigate('/doctor-portal');
       return;
     }
 
-    setIsOperator(true);
     setLoading(false);
   };
 
@@ -181,7 +179,7 @@ const CreatePrescription = () => {
         description: "The prescription has been saved and shared with the patient",
       });
 
-      navigate('/operator-dashboard');
+      navigate('/doctor-portal');
     } catch (error: any) {
       console.error('Error creating prescription:', error);
       toast({
@@ -205,38 +203,25 @@ const CreatePrescription = () => {
     );
   }
 
-  if (!isOperator) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="pt-24 flex items-center justify-center">
-          <Card className="max-w-md">
-            <CardContent className="p-8 text-center">
-              <AlertCircle className="w-16 h-16 text-destructive mx-auto mb-4" />
-              <h2 className="text-xl font-bold mb-2">Access Denied</h2>
-              <p className="text-muted-foreground">
-                Only doctors and operators can create prescriptions.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-24 pb-16 px-4">
         <div className="container mx-auto max-w-4xl">
-          {/* Breadcrumb / Back Navigation */}
-          <div className="mb-4">
+          {/* Breadcrumb / Doctor Workspace Navigation */}
+          <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
             <Link 
-              to="/" 
+              to="/doctor-portal" 
               className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Back to Home (Landing Page)</span>
+              <span>Back to Doctor Workspace</span>
+            </Link>
+            <Link 
+              to="/prescriptions" 
+              className="text-xs font-semibold text-muted-foreground hover:text-primary border rounded-lg px-2.5 py-1 bg-muted/30"
+            >
+              View Issued Prescriptions
             </Link>
           </div>
 
@@ -448,7 +433,7 @@ const CreatePrescription = () => {
 
             {/* Submit */}
             <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={() => navigate('/operator-dashboard')}>
+              <Button variant="outline" onClick={() => navigate('/doctor-portal')}>
                 Cancel
               </Button>
               <Button onClick={handleSubmit} disabled={saving} className="gap-2">

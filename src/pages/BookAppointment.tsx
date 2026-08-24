@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -59,16 +60,16 @@ export const BookAppointment = () => {
   const [holdRemainingSeconds, setHoldRemainingSeconds] = useState<number>(0);
 
   // Patient Intake & Symptoms
-  const [patientName, setPatientName] = useState("Michael Chen");
-  const [patientEmail, setPatientEmail] = useState("michael.chen@example.com");
-  const [patientPhone, setPatientPhone] = useState("+1 (555) 234-5678");
-  const [patientAge, setPatientAge] = useState(46);
-  const [patientGender, setPatientGender] = useState("Male");
+  const [patientName, setPatientName] = useState("");
+  const [patientEmail, setPatientEmail] = useState("");
+  const [patientPhone, setPatientPhone] = useState("");
+  const [patientAge, setPatientAge] = useState(30);
+  const [patientGender, setPatientGender] = useState("Female");
 
   const [symptoms, setSymptoms] = useState("");
-  const [symptomDuration, setSymptomDuration] = useState("3-5 days");
-  const [medicalHistory, setMedicalHistory] = useState("Mild hypertension");
-  const [allergies, setAllergies] = useState("Penicillin");
+  const [symptomDuration, setSymptomDuration] = useState("1-3 days");
+  const [medicalHistory, setMedicalHistory] = useState("None reported");
+  const [allergies, setAllergies] = useState("None");
 
   // AI Summary State
   const [aiSummary, setAiSummary] = useState<PreVisitAISummary | null>(null);
@@ -78,9 +79,28 @@ export const BookAppointment = () => {
   const [bookingLoading, setBookingLoading] = useState(false);
   const [confirmedBooking, setConfirmedBooking] = useState<any>(null);
 
-  // Load doctors on mount
+  // Load doctors on mount & pre-fill logged in patient info
   useEffect(() => {
     loadDoctors();
+
+    // Check supabase auth user
+    supabase.auth.getUser().then(({ data }: any) => {
+      if (data?.user) {
+        const email = data.user.email || "";
+        setPatientEmail(email);
+        const name = data.user.user_metadata?.full_name || email.split("@")[0];
+        setPatientName(name);
+        if (data.user.user_metadata?.phone) {
+          setPatientPhone(data.user.user_metadata.phone);
+        }
+      }
+    }).catch(() => {});
+
+    // Check profile
+    const savedEmail = localStorage.getItem("rapidresq_patient_email");
+    if (savedEmail && !patientEmail) {
+      setPatientEmail(savedEmail);
+    }
   }, [specialisationFilter]);
 
   const loadDoctors = async () => {
@@ -199,6 +219,19 @@ export const BookAppointment = () => {
       return;
     }
 
+    const { data: authData } = await supabase.auth.getUser();
+    if (!authData?.user) {
+      toast.error("Authentication required. Please sign in to book your appointment.");
+      navigate("/auth?redirect=/book");
+      return;
+    }
+
+    const currentEmail = authData.user.email || patientEmail;
+    if (!currentEmail) {
+      toast.error("Patient email is required. Please ensure you are logged in.");
+      return;
+    }
+
     setBookingLoading(true);
     try {
       const booking = await API.bookAppointment({
@@ -206,9 +239,9 @@ export const BookAppointment = () => {
         date: selectedDate,
         startTime: selectedSlot.startTime,
         endTime: selectedSlot.endTime,
-        patientName,
-        patientEmail,
-        patientPhone,
+        patientName: patientName || authData.user.user_metadata?.full_name || currentEmail.split("@")[0],
+        patientEmail: currentEmail,
+        patientPhone: patientPhone || authData.user.user_metadata?.phone || "",
         patientAge,
         patientGender,
         symptoms,
@@ -218,6 +251,10 @@ export const BookAppointment = () => {
         holdToken: holdToken || undefined,
         preVisitAISummary: aiSummary || undefined,
       });
+
+      localStorage.setItem("rapidresq_patient_email", patientEmail);
+      localStorage.setItem("rapidresq_last_booking_email", patientEmail);
+      window.dispatchEvent(new CustomEvent("rapidresq_appointment_booked", { detail: booking }));
 
       setConfirmedBooking(booking);
       setStep(4);
@@ -255,32 +292,35 @@ export const BookAppointment = () => {
           {/* Breadcrumb / Quick Back Navigation */}
           <div className="flex items-center justify-between">
             <Link 
-              to="/" 
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+              to="/patient-portal" 
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Back to Home (Landing Page)</span>
+              <span>Back to Patient Portal Hub</span>
             </Link>
             <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800 text-xs font-semibold px-3 py-1">
+                Patient Portal Desk
+              </Badge>
               <Link 
                 to="/patient-portal" 
-                className="text-xs font-semibold text-muted-foreground hover:text-primary border rounded-lg px-2.5 py-1 bg-muted/30"
+                className="text-xs font-semibold text-muted-foreground hover:text-foreground border rounded-lg px-2.5 py-1 bg-muted/40 transition-colors"
               >
-                My Patient Portal
+                My Care Hub
               </Link>
             </div>
           </div>
 
           {/* Top Banner / Progress Header */}
           <div className="mb-8 text-center">
-        <Badge variant="outline" className="mb-3 px-3 py-1 text-xs font-semibold text-primary border-primary/30 bg-primary/5">
-          <Sparkles className="w-3.5 h-3.5 mr-1.5" /> Intelligent Clinical Booking Engine
+        <Badge variant="outline" className="mb-3 px-3 py-1 text-xs font-semibold text-blue-600 dark:text-blue-400 border-blue-500/30 bg-blue-500/5">
+          <Sparkles className="w-3.5 h-3.5 mr-1.5" /> Patient Portal • Specialist Consultation Booking
         </Badge>
         <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-4xl">
           Book Doctor Consultation
         </h1>
         <p className="mt-2 text-base text-muted-foreground max-w-2xl mx-auto">
-          Select a specialist, secure an atomic slot with zero double-booking, and get an AI pre-visit clinical triage for your doctor.
+          Choose your medical specialist, lock your consultation slot, and receive pre-visit AI clinical preparation synced with your patient portal records.
         </p>
 
         {/* Step Indicators */}
@@ -925,7 +965,7 @@ export const BookAppointment = () => {
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
                 <Button
                   className="flex-1 font-bold"
-                  onClick={() => navigate("/patient-portal")}
+                  onClick={() => navigate(`/patient-portal?email=${encodeURIComponent(confirmedBooking.patientEmail)}`)}
                 >
                   Go to Patient Portal <ArrowRight className="w-4 h-4 ml-1.5" />
                 </Button>

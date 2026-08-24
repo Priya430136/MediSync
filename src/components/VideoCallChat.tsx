@@ -177,29 +177,34 @@ const VideoCallChat = ({ roomId, userId, userName, isOpen, onClose }: VideoCallC
   if (!isOpen) return null;
 
   return (
-    <div className="absolute top-4 right-52 md:right-56 w-80 h-[calc(100vh-8rem)] bg-background/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-border/50 flex flex-col overflow-hidden z-50">
+    <div className="fixed inset-y-0 right-0 w-full sm:w-80 md:w-96 bg-slate-900/95 text-white backdrop-blur-2xl border-l border-white/10 shadow-2xl flex flex-col z-50 animate-in slide-in-from-right duration-200">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border/50">
+      <div className="flex items-center justify-between px-4 py-3.5 border-b border-white/10 bg-slate-950/60">
         <div className="flex items-center gap-2">
-          <h3 className="font-semibold">In-Call Chat</h3>
+          <h3 className="font-bold text-sm text-white">Consultation Chat</h3>
           {messages.length > 0 && (
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-[10px] bg-emerald-500/20 text-emerald-300 border-emerald-500/30">
               {messages.length}
             </Badge>
           )}
         </div>
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-8 w-8 text-slate-400 hover:text-white hover:bg-white/10 rounded-full" 
+          onClick={onClose}
+        >
           <X className="w-4 h-4" />
         </Button>
       </div>
 
       {/* Messages */}
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-        <div className="space-y-4">
+        <div className="space-y-3">
           {messages.length === 0 ? (
-            <div className="text-center text-muted-foreground text-sm py-8">
-              <p>No messages yet</p>
-              <p className="text-xs mt-1">Send a message, link, or file</p>
+            <div className="text-center text-slate-400 text-xs py-12 space-y-1">
+              <p className="font-medium text-slate-300">No in-session messages</p>
+              <p className="text-[11px] text-slate-500">Send clinical notes, symptoms, links, or test reports.</p>
             </div>
           ) : (
             messages.map((msg) => (
@@ -207,32 +212,32 @@ const VideoCallChat = ({ roomId, userId, userName, isOpen, onClose }: VideoCallC
                 key={msg.id}
                 className={`flex flex-col ${msg.senderId === userId ? 'items-end' : 'items-start'}`}
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5 mb-1 px-1">
+                  <span className="text-[10px] font-semibold text-slate-400">
                     {msg.senderId === userId ? 'You' : msg.senderName}
                   </span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-[10px] text-slate-500">
                     {formatTime(msg.timestamp)}
                   </span>
                 </div>
                 <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-2 ${
+                  className={`max-w-[88%] rounded-2xl px-3.5 py-2 text-xs ${
                     msg.senderId === userId
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
+                      ? 'bg-emerald-600 text-white rounded-br-none shadow-md'
+                      : 'bg-slate-800 text-slate-100 border border-white/10 rounded-bl-none shadow-sm'
                   }`}
                 >
                   {msg.type === 'text' && (
-                    <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
+                    <p className="whitespace-pre-wrap break-words leading-relaxed">{msg.content}</p>
                   )}
                   {msg.type === 'link' && (
                     <a
                       href={msg.content}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm hover:underline"
+                      className="flex items-center gap-1.5 text-emerald-200 underline font-medium"
                     >
-                      <LinkIcon className="w-4 h-4 flex-shrink-0" />
+                      <LinkIcon className="w-3.5 h-3.5 flex-shrink-0" />
                       <span className="truncate">{msg.content}</span>
                       <ExternalLink className="w-3 h-3 flex-shrink-0" />
                     </a>
@@ -242,11 +247,13 @@ const VideoCallChat = ({ roomId, userId, userName, isOpen, onClose }: VideoCallC
                       href={msg.fileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm hover:underline"
+                      className="flex items-center gap-2 hover:opacity-90 transition-opacity"
                     >
-                      {getFileIcon(msg.fileName || '')}
-                      <span className="truncate flex-1">{msg.fileName}</span>
-                      <Download className="w-4 h-4 flex-shrink-0" />
+                      <div className="p-1.5 rounded-lg bg-black/20">
+                        {getFileIcon(msg.fileName || '')}
+                      </div>
+                      <span className="truncate flex-1 font-medium">{msg.fileName}</span>
+                      <Download className="w-3.5 h-3.5 flex-shrink-0" />
                     </a>
                   )}
                 </div>
@@ -257,7 +264,7 @@ const VideoCallChat = ({ roomId, userId, userName, isOpen, onClose }: VideoCallC
       </ScrollArea>
 
       {/* Input */}
-      <div className="p-4 border-t border-border/50">
+      <div className="p-3 border-t border-white/10 bg-slate-950/60">
         <div className="flex items-center gap-2">
           <input
             type="file"
@@ -269,31 +276,32 @@ const VideoCallChat = ({ roomId, userId, userName, isOpen, onClose }: VideoCallC
           <Button
             variant="ghost"
             size="icon"
-            className="h-10 w-10 flex-shrink-0"
+            className="h-9 w-9 text-slate-400 hover:text-white hover:bg-white/10 rounded-xl shrink-0"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
+            title="Attach Lab Report or Image"
           >
-            <Paperclip className={`w-5 h-5 ${isUploading ? 'animate-pulse' : ''}`} />
+            <Paperclip className={`w-4 h-4 ${isUploading ? 'animate-pulse text-emerald-400' : ''}`} />
           </Button>
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
-            className="flex-1"
+            placeholder="Type message or paste link..."
+            className="flex-1 bg-slate-950/70 border-white/10 text-white placeholder:text-slate-500 text-xs h-9 focus-visible:ring-emerald-500 rounded-xl"
             disabled={isUploading}
           />
           <Button
             size="icon"
-            className="h-10 w-10 flex-shrink-0"
+            className="h-9 w-9 shrink-0 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl"
             onClick={handleSend}
             disabled={!newMessage.trim() || isUploading}
           >
-            <Send className="w-5 h-5" />
+            <Send className="w-4 h-4" />
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2 text-center">
-          Paste URLs to share links • Attach files up to 10MB
+        <p className="text-[10px] text-slate-500 mt-2 text-center">
+          Encrypted peer exchange • Files up to 10MB
         </p>
       </div>
     </div>

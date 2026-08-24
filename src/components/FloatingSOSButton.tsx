@@ -10,8 +10,8 @@ const FloatingSOSButton = () => {
   const location = useLocation();
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Don't show on auth, sos, or driver pages
-  if (['/sos', '/driver', '/auth'].includes(location.pathname)) {
+  // Don't show on auth or sos pages
+  if (['/sos', '/auth'].includes(location.pathname)) {
     return null;
   }
 

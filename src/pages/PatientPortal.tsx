@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Appointment, MedicationReminder, Slot } from "@/types/appointment";
 import { API } from "@/lib/api";
@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { OperationsCommandBar } from "@/components/OperationsCommandBar";
 import {
   Calendar,
   Clock,
@@ -34,13 +35,28 @@ import {
   ShieldAlert,
   ArrowRight,
   ArrowLeft,
-  Home
+  Home,
+  Search,
+  Check
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const PatientPortal = () => {
   const navigate = useNavigate();
-  const [patientEmail, setPatientEmail] = useState("michael.chen@example.com");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const emailFromUrl = searchParams.get("email");
+
+  const [patientEmail, setPatientEmail] = useState<string>(() => {
+    return emailFromUrl || localStorage.getItem("rapidresq_patient_email") || localStorage.getItem("rapidresq_last_booking_email") || "michael.chen@example.com";
+  });
+  const [customEmailInput, setCustomEmailInput] = useState("");
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [knownEmails, setKnownEmails] = useState<string[]>([
+    "michael.chen@example.com",
+    "emma.watson@example.com",
+    "alice@test.com"
+  ]);
+
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [reminders, setReminders] = useState<MedicationReminder[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,34 +71,120 @@ export const PatientPortal = () => {
   const [rescheduleReason, setRescheduleReason] = useState("");
   const [submittingReschedule, setSubmittingReschedule] = useState(false);
 
-  // Sync with logged in user if available
+  // Sync with URL parameter or Supabase auth on load
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }: any) => {
-      if (data?.user?.email) {
-        setPatientEmail(data.user.email);
+    if (emailFromUrl && emailFromUrl.trim()) {
+      setPatientEmail(emailFromUrl.trim());
+      setKnownEmails(prev => Array.from(new Set([emailFromUrl.trim(), ...prev])));
+    } else {
+      supabase.auth.getUser().then(({ data }: any) => {
+        if (data?.user?.email) {
+          const authEmail = data.user.email;
+          setKnownEmails(prev => Array.from(new Set([authEmail, ...prev])));
+          // If no specific email is in localStorage or URL, prefer auth email
+          if (!localStorage.getItem("rapidresq_patient_email")) {
+            setPatientEmail(authEmail);
+          }
+        }
+      }).catch(() => {});
+    }
+
+    const saved = localStorage.getItem("rapidresq_patient_email") || localStorage.getItem("rapidresq_last_booking_email");
+    if (saved) {
+      setKnownEmails(prev => Array.from(new Set([saved, ...prev])));
+    }
+  }, [emailFromUrl]);
+
+  // Discover other booked patient emails from existing appointments
+  const discoverAllEmails = useCallback(async () => {
+    try {
+      const allApts = await API.getAppointments();
+      if (Array.isArray(allApts) && allApts.length > 0) {
+        const discovered = allApts.map(a => a.patientEmail).filter(Boolean);
+        setKnownEmails(prev => Array.from(new Set([...prev, ...discovered])));
       }
-    }).catch(() => {});
+    } catch (e) {
+      // Non-blocking discovery
+    }
   }, []);
 
-  // Load data on email change
   useEffect(() => {
-    loadData();
-  }, [patientEmail]);
+    discoverAllEmails();
+  }, [discoverAllEmails]);
 
-  const loadData = async () => {
+  // Load patient appointments & reminders
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
+      const filterParams = patientEmail === "ALL_PATIENTS" ? {} : { patientEmail };
       const [apts, rems] = await Promise.all([
-        API.getAppointments({ patientEmail }),
-        API.getReminders(patientEmail),
+        API.getAppointments(filterParams),
+        patientEmail === "ALL_PATIENTS" ? API.getReminders() : API.getReminders(patientEmail),
       ]);
-      setAppointments(apts);
-      setReminders(rems);
+      setAppointments(apts || []);
+      setReminders(rems || []);
+
+      // If we got appointments, add their emails to known list
+      if (Array.isArray(apts)) {
+        const foundEmails = apts.map(a => a.patientEmail).filter(Boolean);
+        if (foundEmails.length > 0) {
+          setKnownEmails(prev => Array.from(new Set([...prev, ...foundEmails])));
+        }
+      }
     } catch (err: any) {
       toast.error("Failed to load patient data: " + err.message);
     } finally {
       setLoading(false);
     }
+  }, [patientEmail]);
+
+  // Load data on email change
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Listen to cross-tab / event-based booking notifications
+  useEffect(() => {
+    const handleAppointmentBooked = (e: any) => {
+      const bookedEmail = e?.detail?.patientEmail;
+      if (bookedEmail) {
+        setKnownEmails(prev => Array.from(new Set([bookedEmail, ...prev])));
+        setPatientEmail(bookedEmail);
+        setSearchParams({ email: bookedEmail });
+      }
+      loadData();
+    };
+
+    window.addEventListener("rapidresq_appointment_booked", handleAppointmentBooked);
+    window.addEventListener("storage", loadData);
+
+    return () => {
+      window.removeEventListener("rapidresq_appointment_booked", handleAppointmentBooked);
+      window.removeEventListener("storage", loadData);
+    };
+  }, [loadData, setSearchParams]);
+
+  const handleSelectEmail = (selected: string) => {
+    setPatientEmail(selected);
+    if (selected === "ALL_PATIENTS") {
+      searchParams.delete("email");
+      setSearchParams(searchParams);
+    } else {
+      setSearchParams({ email: selected });
+      localStorage.setItem("rapidresq_patient_email", selected);
+    }
+  };
+
+  const handleApplyCustomEmail = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customEmailInput.trim()) return;
+    const clean = customEmailInput.trim().toLowerCase();
+    setKnownEmails(prev => Array.from(new Set([clean, ...prev])));
+    setPatientEmail(clean);
+    setSearchParams({ email: clean });
+    localStorage.setItem("rapidresq_patient_email", clean);
+    setIsEditingEmail(false);
+    setCustomEmailInput("");
   };
 
   const handleOpenRescheduleModal = async (apt: Appointment) => {
@@ -233,23 +335,114 @@ export const PatientPortal = () => {
           </p>
         </div>
 
-        {/* Demo Patient Account Switcher */}
-        <div className="flex items-center gap-3 bg-muted/40 p-2.5 rounded-xl border">
-          <span className="text-xs text-muted-foreground font-medium">Viewing as:</span>
-          <select
-            value={patientEmail}
-            onChange={(e) => setPatientEmail(e.target.value)}
-            className="text-xs font-semibold bg-background border rounded-lg px-2.5 py-1.5 focus:ring-1 focus:ring-primary"
-          >
-            <option value="michael.chen@example.com">Michael Chen (Cardiology Patient)</option>
-            <option value="emma.watson@example.com">Emma Watson (Flu & Post-Visit Summary)</option>
-            <option value="alice@test.com">Alice Johnson</option>
-          </select>
-          <Button size="sm" onClick={() => navigate("/book")} className="text-xs font-bold shrink-0">
-            <PlusCircle className="w-3.5 h-3.5 mr-1" /> Book New
-          </Button>
+        {/* Patient Account & Email Switcher */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-muted/40 p-3 rounded-xl border">
+          {!isEditingEmail ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
+                <User className="w-3.5 h-3.5" /> Patient:
+              </span>
+              <select
+                value={patientEmail}
+                onChange={(e) => handleSelectEmail(e.target.value)}
+                className="text-xs font-bold bg-background border rounded-lg px-2.5 py-1.5 focus:ring-1 focus:ring-primary max-w-[220px] truncate"
+              >
+                <option value="ALL_PATIENTS">🌐 View All Consultations</option>
+                {knownEmails.map((email) => (
+                  <option key={email} value={email}>
+                    {email === "michael.chen@example.com"
+                      ? "Michael Chen (Cardiology)"
+                      : email === "emma.watson@example.com"
+                      ? "Emma Watson (Flu / Meds)"
+                      : email}
+                  </option>
+                ))}
+              </select>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setIsEditingEmail(true)}
+                className="text-xs text-muted-foreground hover:text-primary px-2 h-8"
+                title="Enter custom email"
+              >
+                <Search className="w-3.5 h-3.5 mr-1" /> Other Email
+              </Button>
+            </div>
+          ) : (
+            <form onSubmit={handleApplyCustomEmail} className="flex items-center gap-1.5">
+              <Input
+                type="email"
+                placeholder="Enter patient email..."
+                value={customEmailInput}
+                onChange={(e) => setCustomEmailInput(e.target.value)}
+                className="h-8 text-xs w-48 bg-background"
+                autoFocus
+              />
+              <Button type="submit" size="sm" className="h-8 text-xs font-bold px-2.5">
+                <Check className="w-3.5 h-3.5 mr-1" /> Apply
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditingEmail(false)}
+                className="h-8 text-xs px-2"
+              >
+                Cancel
+              </Button>
+            </form>
+          )}
+
+          <div className="flex items-center gap-2 shrink-0 ml-auto sm:ml-0">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={loadData}
+              disabled={loading}
+              className="text-xs font-semibold px-2.5 h-8 bg-background"
+              title="Refresh appointments"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 mr-1 ${loading ? "animate-spin text-primary" : ""}`} /> Refresh
+            </Button>
+            <Button size="sm" onClick={() => navigate("/book")} className="text-xs font-bold shrink-0 h-8">
+              <PlusCircle className="w-3.5 h-3.5 mr-1" /> Book New
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* 3-Second Patient Care Operations Command Bar */}
+      <OperationsCommandBar
+        happeningText={`Tracking health records for ${patientEmail === "ALL_PATIENTS" ? "all connected patients" : patientEmail}.`}
+        happeningMetrics={[
+          { label: 'Upcoming', value: appointments.filter(a => a.status === 'confirmed' || a.status === 'pending').length, tone: 'normal' },
+          { label: 'Medicines', value: reminders.filter(r => r.active).length, tone: 'good' },
+          { label: 'Completed', value: appointments.filter(a => a.status === 'completed').length, tone: 'normal' },
+        ]}
+        attentionText={
+          leaveAlertAppointments.length > 0
+            ? `⚠️ Action required: Dr. ${leaveAlertAppointments[0].doctorName} scheduled leave affects your booking.`
+            : appointments.some(a => a.status === 'pending')
+            ? `1 consultation booking is pending doctor clinic confirmation.`
+            : `All consultations and daily medicine schedules are up to date.`
+        }
+        attentionSeverity={leaveAlertAppointments.length > 0 ? 'critical' : 'normal'}
+        nextActionText={
+          leaveAlertAppointments.length > 0
+            ? "Click below to select an alternate slot with priority zero-wait rescheduling."
+            : "Book a specialist doctor consultation or view your e-prescriptions."
+        }
+        primaryActionLabel={leaveAlertAppointments.length > 0 ? "📅 Reschedule Booking" : "➕ Book Doctor"}
+        onPrimaryAction={() => {
+          if (leaveAlertAppointments.length > 0) {
+            handleOpenRescheduleModal(leaveAlertAppointments[0]);
+          } else {
+            navigate('/book');
+          }
+        }}
+        secondaryActionLabel="My Prescriptions"
+        onSecondaryAction={() => navigate('/prescriptions')}
+      />
 
       {/* Leave Conflict Alert Banner */}
       {leaveAlertAppointments.length > 0 && (

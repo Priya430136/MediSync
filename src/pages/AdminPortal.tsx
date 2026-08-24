@@ -384,26 +384,36 @@ export const AdminPortal = () => {
       <main className="pt-24 pb-16 px-4">
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Breadcrumb / Quick Back Navigation */}
-          <div className="flex items-center justify-between">
-            <Link 
-              to="/" 
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back to Home (Landing Page)</span>
-            </Link>
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Link 
-                to="/doctor-portal" 
-                className="text-xs font-semibold text-muted-foreground hover:text-primary border rounded-lg px-2.5 py-1 bg-muted/30"
+                to="/hospital" 
+                className="inline-flex items-center gap-1.5 font-medium hover:text-primary transition-colors"
               >
-                Doctor Portal
+                <ArrowLeft className="w-4 h-4" />
+                <span>Hospital ER Command</span>
+              </Link>
+              <span>/</span>
+              <span className="font-semibold text-foreground">Hospital Admin Matrix</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Link 
+                to="/" 
+                className="text-xs font-semibold text-muted-foreground hover:text-primary transition-colors px-2 py-1"
+              >
+                Home
               </Link>
               <Link 
-                to="/patient-portal" 
-                className="text-xs font-semibold text-muted-foreground hover:text-primary border rounded-lg px-2.5 py-1 bg-muted/30"
+                to="/hospital" 
+                className="text-xs font-semibold text-rose-700 dark:text-rose-300 hover:bg-rose-500/20 border border-rose-300 dark:border-rose-700/50 rounded-lg px-2.5 py-1 bg-rose-500/10"
               >
-                Patient Portal
+                Hospital ER Command
+              </Link>
+              <Link 
+                to="/doctor-portal" 
+                className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 border border-emerald-300 dark:border-emerald-700/50 rounded-lg px-2.5 py-1 bg-emerald-500/10"
+              >
+                Doctor Portal
               </Link>
             </div>
           </div>

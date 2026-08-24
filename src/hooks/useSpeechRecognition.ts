@@ -75,8 +75,10 @@ export const useSpeechRecognition = () => {
         setTranscript(finalTranscript || interimTranscript);
       };
 
-      recognitionRef.current.onerror = (event) => {
-        console.error('Speech recognition error:', event);
+      recognitionRef.current.onerror = (event: any) => {
+        if (event.error !== 'aborted' && event.error !== 'no-speech') {
+          console.warn('Speech recognition notice:', event.error || event);
+        }
         setIsListening(false);
       };
 

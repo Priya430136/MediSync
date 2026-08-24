@@ -183,12 +183,14 @@ const VoiceSOSTrigger = ({ onTriggerSOS, isEmergencyActive, disabled }: VoiceSOS
     };
 
     recognitionRef.current.onerror = (event: any) => {
-      console.error('Voice recognition error:', event.error);
-      
       if (event.error === 'not-allowed') {
+        console.warn('Voice recognition permission denied');
         toast.error('Microphone access denied. Please enable it in your browser settings.');
         setIsEnabled(false);
-      } else if (event.error !== 'no-speech' && event.error !== 'aborted') {
+      } else if (event.error === 'no-speech' || event.error === 'aborted') {
+        // Normal lifecycle events when audio stops or component re-renders
+      } else {
+        console.warn('Voice recognition notice:', event.error);
         scheduleRestart();
       }
       

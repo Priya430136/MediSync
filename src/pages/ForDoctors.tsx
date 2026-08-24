@@ -1,34 +1,69 @@
+import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Stethoscope, IndianRupee, Clock, Users, Smartphone, TrendingUp, Award, Shield, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Stethoscope, IndianRupee, Clock, Users, Smartphone, TrendingUp, Award, Shield, ArrowLeft, ArrowRight } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const ForDoctors = () => {
+  const [user, setUser] = useState<any>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data?.user || null);
+    });
+  }, []);
+
+  const isDoctor = user?.email?.toLowerCase().includes('doctor') || user?.user_metadata?.role === 'doctor';
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-24 pb-16 px-4">
-        <div className="container mx-auto">
+        <div className="container mx-auto max-w-6xl">
           {/* Breadcrumb / Back Navigation */}
-          <div className="mb-4">
+          <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
             <Link 
-              to="/" 
+              to={isDoctor ? "/doctor-portal" : "/"} 
               className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Back to Home (Landing Page)</span>
+              <span>{isDoctor ? "Back to Doctor Workspace" : "Back to Home"}</span>
             </Link>
+            {isDoctor && (
+              <div className="flex items-center gap-2">
+                <Link to="/doctor-portal">
+                  <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs gap-1.5">
+                    <Stethoscope className="w-3.5 h-3.5" /> Open Doctor Workspace
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
 
           <div className="text-center mb-16">
             <h1 className="text-5xl font-bold text-foreground mb-4">
-              Join <span className="text-primary">RapidResQ</span> Network
+              {isDoctor ? "Doctor Clinical Network" : "Join RapidResQ Network"}
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-              Partner with India's fastest-growing emergency healthcare platform and expand your practice
+              {isDoctor 
+                ? "Manage patient consultations, digital e-prescriptions, and synchronized hospital schedule slots."
+                : "Partner with India's fastest-growing emergency healthcare platform and expand your practice"}
             </p>
-            <Button size="lg" className="px-12">Register as a Doctor</Button>
+            {isDoctor ? (
+              <div className="flex items-center justify-center gap-4 flex-wrap">
+                <Button size="lg" onClick={() => navigate('/doctor-portal')} className="px-8 bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-2">
+                  <Stethoscope className="w-4 h-4" /> Go to Doctor Workspace
+                </Button>
+                <Button size="lg" variant="outline" onClick={() => navigate('/create-prescription')} className="px-8 gap-2">
+                  + Write Prescription
+                </Button>
+              </div>
+            ) : (
+              <Button size="lg" onClick={() => navigate('/auth?role=doctor')} className="px-12">Register as a Doctor</Button>
+            )}
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">

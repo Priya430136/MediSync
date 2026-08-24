@@ -57,32 +57,6 @@ const DEFAULT_DEMO_USERS: LocalUser[] = [
     created_at: new Date().toISOString()
   },
   {
-    id: "usr-driver-001",
-    email: "driver@rapidresq.com",
-    password: "Password@123",
-    user_metadata: {
-      full_name: "Rajesh Kumar",
-      phone: "+919876543212",
-      role: "driver"
-    },
-    app_metadata: { provider: "email" },
-    aud: "authenticated",
-    created_at: new Date().toISOString()
-  },
-  {
-    id: "usr-operator-001",
-    email: "operator@rapidresq.com",
-    password: "Password@123",
-    user_metadata: {
-      full_name: "Amit Verma",
-      phone: "+919876543213",
-      role: "operator"
-    },
-    app_metadata: { provider: "email" },
-    aud: "authenticated",
-    created_at: new Date().toISOString()
-  },
-  {
     id: "usr-hospital-001",
     email: "hospital@rapidresq.com",
     password: "Password@123",
@@ -739,6 +713,133 @@ class LocalSupabaseStorageBucket {
   }
 }
 
+class LocalRealtimeChannel {
+  name: string;
+  private opts: any;
+  private listeners: Array<{ type: string; filter?: any; callback: (payload: any) => void }> = [];
+  private windowListener: ((e: Event) => void) | null = null;
+  private presenceMap: Record<string, any[]> = {};
+
+  constructor(name: string, opts?: any) {
+    this.name = name;
+    this.opts = opts || {};
+  }
+
+  on(type: string, filterOrCallback: any, maybeCallback?: any) {
+    let filter = filterOrCallback;
+    let callback = maybeCallback;
+    if (typeof filterOrCallback === 'function') {
+      callback = filterOrCallback;
+      filter = {};
+    }
+    if (typeof callback === 'function') {
+      this.listeners.push({ type, filter, callback });
+    }
+    return this;
+  }
+
+  subscribe(statusCallback?: (status: string) => void) {
+    if (typeof window !== 'undefined') {
+      this.windowListener = (e: Event) => {
+        const detail = (e as CustomEvent).detail;
+        if (!detail || detail.channel !== this.name) return;
+
+        for (const handler of this.listeners) {
+          if (handler.type === detail.type) {
+            // Check event name if specified
+            if (handler.filter?.event && detail.event && handler.filter.event !== '*' && handler.filter.event !== detail.event) {
+              continue;
+            }
+            try {
+              handler.callback({
+                event: detail.event,
+                payload: detail.payload,
+                new: detail.payload?.new,
+                old: detail.payload?.old,
+                eventType: detail.payload?.eventType || 'INSERT',
+                key: detail.key
+              });
+            } catch (err) {
+              console.warn('[LocalRealtimeChannel] Handler error:', err);
+            }
+          }
+        }
+      };
+
+      window.addEventListener('rapidresq:realtime_channel', this.windowListener);
+    }
+
+    if (statusCallback) {
+      setTimeout(() => statusCallback('SUBSCRIBED'), 0);
+    }
+    return this;
+  }
+
+  async unsubscribe() {
+    if (this.windowListener && typeof window !== 'undefined') {
+      window.removeEventListener('rapidresq:realtime_channel', this.windowListener);
+      this.windowListener = null;
+    }
+    this.listeners = [];
+    return 'ok';
+  }
+
+  async send(msg: { type: string; event?: string; payload?: any }) {
+    if (typeof window !== 'undefined') {
+      const event = new CustomEvent('rapidresq:realtime_channel', {
+        detail: {
+          channel: this.name,
+          type: msg.type || 'broadcast',
+          event: msg.event,
+          payload: msg.payload
+        }
+      });
+      window.dispatchEvent(event);
+    }
+    return { error: null };
+  }
+
+  async track(state: any) {
+    const key = this.opts?.config?.presence?.key || 'local_user';
+    this.presenceMap[key] = [{ presence_ref: `ref_${Date.now()}`, ...state }];
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('rapidresq:realtime_channel', {
+        detail: {
+          channel: this.name,
+          type: 'presence',
+          event: 'join',
+          key,
+          payload: state
+        }
+      }));
+    }
+    return 'ok';
+  }
+
+  async untrack() {
+    const key = this.opts?.config?.presence?.key || 'local_user';
+    delete this.presenceMap[key];
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('rapidresq:realtime_channel', {
+        detail: {
+          channel: this.name,
+          type: 'presence',
+          event: 'leave',
+          key,
+          payload: {}
+        }
+      }));
+    }
+    return 'ok';
+  }
+
+  presenceState() {
+    return this.presenceMap;
+  }
+}
+
 class LocalSupabaseClient {
   auth = new LocalSupabaseAuth();
   
@@ -746,30 +847,14 @@ class LocalSupabaseClient {
     return new LocalSupabaseQueryBuilder(tableName);
   }
 
-  channel(channelName: string) {
-    return {
-      name: channelName,
-      on: (_event: string, _filter: any, _callback: any) => {
-        return {
-          subscribe: (statusCallback?: (status: string) => void) => {
-            if (statusCallback) statusCallback('SUBSCRIBED');
-            return {
-              unsubscribe: () => {}
-            };
-          }
-        };
-      },
-      subscribe: (statusCallback?: (status: string) => void) => {
-        if (statusCallback) statusCallback('SUBSCRIBED');
-        return {
-          unsubscribe: () => {}
-        };
-      }
-    };
+  channel(channelName: string, opts?: any) {
+    return new LocalRealtimeChannel(channelName, opts);
   }
 
-  removeChannel(_channel: any) {
-    // no-op for local mock
+  removeChannel(channel: any) {
+    if (channel && typeof channel.unsubscribe === 'function') {
+      channel.unsubscribe();
+    }
   }
 
   storage = {

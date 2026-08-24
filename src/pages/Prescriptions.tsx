@@ -83,6 +83,8 @@ const Prescriptions = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const [userRole, setUserRole] = useState<string>('patient');
+
   useEffect(() => {
     checkUser();
   }, []);
@@ -94,20 +96,44 @@ const Prescriptions = () => {
       return;
     }
     setUser(user);
-    fetchPrescriptions(user.id);
+
+    let role = user.user_metadata?.role;
+    if (!role && user.email) {
+      if (user.email.toLowerCase().includes('doctor')) role = 'doctor';
+      else if (user.email.toLowerCase().includes('driver')) role = 'driver';
+      else if (user.email.toLowerCase().includes('operator')) role = 'operator';
+      else if (user.email.toLowerCase().includes('hospital')) role = 'hospital';
+      else if (user.email.toLowerCase().includes('admin')) role = 'admin';
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single();
+
+    if (profile?.role) role = profile.role;
+    setUserRole(role || 'patient');
+
+    fetchPrescriptions(user.id, role === 'doctor');
     fetchUploadedPrescriptions(user.id);
   };
 
-  const fetchPrescriptions = async (userId: string) => {
+  const fetchPrescriptions = async (userId: string, isDoc?: boolean) => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('prescriptions')
         .select(`
           *,
           doctors (name, specialization)
         `)
-        .eq('patient_id', userId)
         .order('created_at', { ascending: false });
+
+      if (!isDoc) {
+        query = query.eq('patient_id', userId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setPrescriptions(data || []);
@@ -285,35 +311,63 @@ const Prescriptions = () => {
       <Navbar />
       <main className="pt-24 pb-16 px-4">
         <div className="container mx-auto max-w-5xl">
-          {/* Breadcrumb / Back Navigation */}
-          <div className="mb-4">
+          {/* Breadcrumb / Navigation */}
+          <div className="mb-4 flex items-center justify-between flex-wrap gap-2">
             <Link 
-              to="/" 
+              to={userRole === 'doctor' ? "/doctor-portal" : "/"} 
               className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Back to Home (Landing Page)</span>
+              <span>{userRole === 'doctor' ? "Back to Doctor Workspace" : "Back to Home"}</span>
             </Link>
+            {userRole === 'doctor' && (
+              <Link 
+                to="/doctor-portal" 
+                className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 rounded-lg px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20"
+              >
+                🩺 Active Patient Queue
+              </Link>
+            )}
           </div>
 
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
+              <div className="flex items-center gap-2 mb-1">
+                {userRole === 'doctor' ? (
+                  <Badge variant="outline" className="text-emerald-700 dark:text-emerald-300 border-emerald-500/30 bg-emerald-500/10 text-xs font-semibold">
+                    <Stethoscope className="w-3.5 h-3.5 mr-1" /> Doctor Prescription Records
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="text-blue-700 dark:text-blue-300 border-blue-500/30 bg-blue-500/10 text-xs font-semibold">
+                    <FileText className="w-3.5 h-3.5 mr-1" /> Patient Medical Records
+                  </Badge>
+                )}
+              </div>
               <h1 className="text-3xl font-bold text-foreground mb-2">
-                Medical Records
+                {userRole === 'doctor' ? "Issued Prescriptions & Records" : "Medical Records"}
               </h1>
               <p className="text-muted-foreground">
-                Manage your digital prescriptions and uploaded medical records
+                {userRole === 'doctor' 
+                  ? "View, inspect, and issue validated clinical prescriptions for patients" 
+                  : "Manage your digital prescriptions and uploaded medical records"}
               </p>
             </div>
             
-            <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="gap-2">
-                  <Upload className="w-4 h-4" />
-                  Upload Record
+            <div className="flex items-center gap-2 flex-wrap">
+              {userRole === 'doctor' && (
+                <Button onClick={() => navigate('/create-prescription')} className="gap-2 bg-emerald-600 hover:bg-emerald-700 text-white">
+                  <Plus className="w-4 h-4" />
+                  Write Prescription
                 </Button>
-              </DialogTrigger>
+              )}
+              <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant={userRole === 'doctor' ? "outline" : "default"} className="gap-2">
+                    <Upload className="w-4 h-4" />
+                    Upload Record
+                  </Button>
+                </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Upload Medical Record</DialogTitle>
@@ -369,6 +423,7 @@ const Prescriptions = () => {
                 </form>
               </DialogContent>
             </Dialog>
+            </div>
           </div>
 
           <Tabs defaultValue="digital" className="space-y-6">

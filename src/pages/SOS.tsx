@@ -333,8 +333,7 @@ const SOS = () => {
       setCurrentBooking(bookingData as Booking);
       toast.success("Emergency request sent! Ambulance is being dispatched.");
 
-      // Removed simulation: Real-time assignment is handled by OperatorDashboard.tsx
-      // or a background service in production.
+      // Dispatch telemetry is stored and broadcast via emergency dispatch service.
 
     } catch (error: any) {
       handleApiError(error, "Failed to send emergency request");

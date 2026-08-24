@@ -9,9 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { GoogleCalendarManager } from "@/components/GoogleCalendarManager";
+import { OperationsCommandBar } from "@/components/OperationsCommandBar";
 import {
   Stethoscope,
   Calendar,
@@ -126,6 +127,12 @@ export const DoctorPortal = () => {
       toast.error("Failed to load doctor appointments: " + err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadAppointments = () => {
+    if (selectedDoctorId) {
+      loadDoctorAppointments(selectedDoctorId);
     }
   };
 
@@ -322,27 +329,33 @@ export const DoctorPortal = () => {
       <Navbar />
       <main className="pt-24 pb-16 px-4">
         <div className="max-w-6xl mx-auto space-y-8">
-          {/* Breadcrumb / Quick Back Navigation */}
-          <div className="flex items-center justify-between">
+          {/* Breadcrumb / Quick Doctor Clinical Navigation */}
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <Link 
               to="/" 
               className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Back to Home (Landing Page)</span>
+              <span>Back to Home</span>
             </Link>
             <div className="flex items-center gap-2">
               <Link 
-                to="/patient-portal" 
-                className="text-xs font-semibold text-muted-foreground hover:text-primary border rounded-lg px-2.5 py-1 bg-muted/30"
+                to="/create-prescription" 
+                className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 rounded-lg px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20"
               >
-                Patient Portal
+                + Write Prescription
               </Link>
               <Link 
-                to="/admin" 
+                to="/prescriptions" 
                 className="text-xs font-semibold text-muted-foreground hover:text-primary border rounded-lg px-2.5 py-1 bg-muted/30"
               >
-                Admin Portal
+                Prescription Records
+              </Link>
+              <Link 
+                to="/doctors" 
+                className="text-xs font-semibold text-muted-foreground hover:text-primary border rounded-lg px-2.5 py-1 bg-muted/30"
+              >
+                Physicians Network
               </Link>
             </div>
           </div>
@@ -421,6 +434,37 @@ export const DoctorPortal = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* 3-Second Clinical Operations Command Bar */}
+      <OperationsCommandBar
+        happeningText={`${appointments.filter(a => a.status === 'confirmed' || a.status === 'pending').length} patient(s) in active queue for Dr. ${activeDoctor?.name?.split(' ')[1] || 'Physician'}.`}
+        happeningMetrics={[
+          { label: 'In Queue', value: appointments.filter(a => a.status === 'confirmed' || a.status === 'pending').length, tone: 'normal' },
+          { label: 'Completed', value: appointments.filter(a => a.status === 'completed').length, tone: 'good' },
+          { label: 'Total', value: appointments.length, tone: 'normal' },
+        ]}
+        attentionText={
+          appointments.some(a => a.preVisitAiBriefing?.redFlags?.length)
+            ? `⚠️ Red Flag alert detected in patient pre-visit symptom triage. Immediate clinical review required.`
+            : `All upcoming appointment slots synchronized with Google Calendar.`
+        }
+        attentionSeverity={appointments.some(a => a.preVisitAiBriefing?.redFlags?.length) ? 'critical' : 'normal'}
+        nextActionText="Open next scheduled patient record or start live consultation."
+        primaryActionLabel="🩺 Next Patient Consultation"
+        onPrimaryAction={() => {
+          const next = appointments.find(a => a.status === 'confirmed' || a.status === 'pending');
+          if (next) {
+            handleOpenConsultation(next);
+          } else {
+            toast.info("No pending patients in queue.");
+          }
+        }}
+        secondaryActionLabel="Sync Calendar"
+        onSecondaryAction={() => {
+          const calTab = document.querySelector('[data-value="calendar"]') as HTMLElement;
+          calTab?.click();
+        }}
+      />
 
       {/* Main Tabs */}
       <Tabs defaultValue="queue" className="space-y-6">
